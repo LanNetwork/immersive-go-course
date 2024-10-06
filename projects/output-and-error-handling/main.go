@@ -11,7 +11,7 @@ func main() {
 	url := "http://localhost:8080"
 	response, err := TryConnection(url)
 	if err != nil {
-		fmt.Println("Error while trying to connect. Please try again!", err) // This is not the message to show the user. Change to a user facing message later.
+		fmt.Println("Error while trying to connect. Please try again!") // This is not the message to show the user. Change to a user facing message later.
 		return
 	}
 	// At this point, the connection has succeeded.
@@ -30,9 +30,12 @@ func main() {
 				}
 				response, err = TryConnection(url)
 				if err != nil {
-					fmt.Println("Error while trying to connect. Please try again!", err)
+					fmt.Println("Error while trying to connect. Please try again!")
 					return
 				}
+			} else { // If the wait time is longer than 5 seconds, just exit
+				fmt.Println("Quitting because connection is taking too long. Please try again!")
+				return
 			}
 		}
 	}
@@ -43,6 +46,7 @@ func main() {
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("Error reading response body: ", err)
+		return
 	}
 
 	// Convert byte array to string and print it
