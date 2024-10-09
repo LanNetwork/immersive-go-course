@@ -12,10 +12,10 @@ func Execute() {
 	if slices.Contains(args, "-h") {
 		hMessage :=
 			`go-ls is a command that performs the same function as the unix ls command.
-		By default, it prints a list of directories (marked by a trailing /), and files (with their extension).
-		go-ls can take any number of arguments, which can be file or directory paths.
-		go-ls -h prints this message and ignores other arguments.
-		`
+By default, it prints a list of directories (marked by a trailing /), and files (with their extension).
+go-ls can take any number of arguments, which can be file or directory paths.
+go-ls -h prints this message and ignores other arguments.
+`
 		fmt.Println(hMessage)
 		os.Exit(0)
 	}
