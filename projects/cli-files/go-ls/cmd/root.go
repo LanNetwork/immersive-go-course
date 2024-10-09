@@ -3,11 +3,22 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
 
 func Execute() {
 	args := os.Args
+	if slices.Contains(args, "-h") {
+		hMessage :=
+			`go-ls is a command that performs the same function as the unix ls command.
+		By default, it prints a list of directories (marked by a trailing /), and files (with their extension).
+		go-ls can take any number of arguments, which can be file or directory paths.
+		go-ls -h prints this message and ignores other arguments.
+		`
+		fmt.Println(hMessage)
+		os.Exit(0)
+	}
 	if len(args) == 1 {
 		cwd, err := os.Getwd()
 		if err != nil {
@@ -29,17 +40,26 @@ func Execute() {
 				fmt.Printf("go-ls: cannot access '%s': No such file or directory\n", p)
 				continue
 			}
+
+			if len(d) > 1 { // If d is longer than 1, place labels of each input unless p is a file
+				if !isFile(p) {
+					fmt.Printf("%s:\n", p)
+				}
+			}
 			fmt.Print(formatted)
 		}
 	}
-
-	// fmt.Println("Current dir contents:", files)
 	os.Exit(0)
 }
 
 func formatDirectory(directory string) (dir string, err error) {
 	files, err := os.ReadDir(directory)
 	if err != nil {
+		// Try to see if it's a file, and if so return the name
+		if isFile(directory) {
+			return directory + "\n\n", nil
+		}
+		// Since directory is not a file (see check above), and it's not a directory (ReadDir failed), return error
 		return "", err
 	}
 
@@ -53,5 +73,17 @@ func formatDirectory(directory string) (dir string, err error) {
 		}
 		sb.WriteString("\n")
 	}
+	sb.WriteString("\n")
 	return sb.String(), nil
+}
+
+// isFile function will only return true if the filePath leads to a file.
+// If it does not exist, or is a directory it will return false.
+func isFile(filePath string) bool {
+	fileInfo, statErr := os.Stat(filePath)
+	if statErr != nil {
+		return false
+	}
+
+	return !fileInfo.IsDir()
 }
